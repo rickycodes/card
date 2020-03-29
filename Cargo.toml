@@ -1,0 +1,8 @@
+[package]
+name = "card"
+version = "0.1.0"
+authors = ["rickycodes <ricky.miller@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+ansi_term = "0.12.1"
