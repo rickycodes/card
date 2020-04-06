@@ -12,19 +12,37 @@ fn colours () {
   }
 }
 
+struct Sites<'a> {
+  twitter: &'a str,
+  npm: &'a str,
+  github: &'a str
+}
+
+struct Card<'a> {
+  name: &'a str,
+  title: &'a str,
+  handle: &'a str,
+  company: &'a str,
+  sites: Sites<'a>
+}
+
 // output card
 fn card () {
-  let name = "Ricky Miller";
-  let title = "Software Developer";
-  let handle = "rickycodes";
-  let company = "MetaMask";
-  let protocol = "https://";
-  let twitter = "twitter.com/";
-  let npm = "npm.im/";
-  let github = "github.com/";
+  let card = Card {
+    name: "Ricky Miller",
+    title: "Software Developer",
+    handle: "rickycodes",
+    company: "MetaMask",
+    sites: Sites {
+      twitter: "twitter.com/",
+      github: "github.com/",
+      npm: "npm.im/"
+    }
+  };
 
-  let npm_path = ["~", &handle].concat();
-  let instructions = ["npx ", &handle].concat();
+  let protocol = "https://";
+  let npm_path = ["~", &card.handle].concat();
+  let instructions = ["npx ", &card.handle].concat();
 
   let blue = 51;
   let pink = 1;
@@ -57,35 +75,35 @@ fn card () {
   edge,
   edge,
   edge,
-  fixed_blue_bold.paint(name),
-  fixed_pink_bold.paint(handle),
+  fixed_blue_bold.paint(card.name),
+  fixed_pink_bold.paint(card.handle),
   edge,
   edge,
   edge,
   edge,
   fixed_blue_bold.paint("Work:"),
-  title,
-  company,
+  card.title,
+  card.company,
   edge,
   edge,
   edge,
   edge,
   fixed_blue_bold.paint("Twitter:"),
   protocol,
-  twitter,
-  fixed_pink.paint(handle),
+  card.sites.twitter,
+  fixed_pink.paint(card.handle),
   edge,
   edge,
   fixed_blue_bold.paint("npm:"),
   protocol,
-  npm,
+  card.sites.npm,
   fixed_pink.paint(npm_path),
   edge,
   edge,
   fixed_blue_bold.paint("GitHub:"),
   protocol,
-  github,
-  fixed_pink.paint(handle),
+  card.sites.github,
+  fixed_pink.paint(card.handle),
   edge,
   edge,
   fixed_blue_bold.paint("Web:"),
