@@ -15,7 +15,8 @@ fn colours () {
 struct Sites<'a> {
   twitter: &'a str,
   npm: &'a str,
-  github: &'a str
+  github: &'a str,
+  crates: &'a str
 }
 
 struct Card<'a> {
@@ -36,7 +37,8 @@ fn card () {
     sites: Sites {
       twitter: "twitter.com/",
       github: "github.com/",
-      npm: "npm.im/"
+      npm: "npm.im/",
+      crates: "crates.io/users/"
     }
   };
 
@@ -64,6 +66,7 @@ fn card () {
   {}                                                                {}
   {}       {}  {}{}{}                 {}
   {}           {}  {}{}{}                     {}
+  {}        {}  {}{}{}             {}
   {}        {}  {}{}{}                  {}
   {}           {}  {}{}                            {}
   {}                                                                {}
@@ -98,6 +101,12 @@ fn card () {
   protocol,
   card.sites.npm,
   fixed_pink.paint(npm_path),
+  edge,
+  edge,
+  fixed_blue_bold.paint("Crates:"),
+  protocol,
+  card.sites.crates,
+  fixed_pink.paint(card.handle),
   edge,
   edge,
   fixed_blue_bold.paint("GitHub:"),
