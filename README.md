@@ -2,6 +2,8 @@
 
 Write a CLI using rustlang targetting wasm so we can run on node and deploy with npx/npm
 
+<img src="screenshot.png">
+
 ## Building
 
 ```
@@ -25,3 +27,7 @@ Once published the binary can be executed with npx:
 npx rickycodes
 ```
 Scripts are also discoverable in [package.json](package.json#L9)
+
+## License
+
+MIT

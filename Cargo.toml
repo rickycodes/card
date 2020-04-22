@@ -1,6 +1,7 @@
 [package]
 name = "card"
 version = "0.1.0"
+license = "MIT"
 authors = ["rickycodes <ricky.miller@gmail.com>"]
 edition = "2018"
 

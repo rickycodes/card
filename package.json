@@ -14,5 +14,5 @@
     "start": "node card.js"
   },
   "author": "rickycodes",
-  "license": "ISC"
+  "license": "MIT"
 }
