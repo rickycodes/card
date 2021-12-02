@@ -3,20 +3,63 @@ on:
     tags:
       - 'v*'
 
-name: Create Release
+name: build and release
 
 jobs:
+  build:
+    name: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: setup rust
+        uses: actions-rs/toolchain@v1
+        with:
+            toolchain: nightly
+            override: true
+            components: rustfmt, clippy
+      - name: add wasm target
+        run: |
+          rustup target add wasm32-unknown-emscripten
+      - name: setup emsdk
+        run: |
+          git clone https://github.com/emscripten-core/emsdk.git
+          cd emsdk
+          git pull
+          ./emsdk install 2.0.0
+          ./emsdk activate 2.0.0
+      - name: setup node
+        uses: actions/setup-node@v2
+      - name: build
+        run: |
+          git --version
+          cargo --version
+          yarn --version
+          source ./emsdk/emsdk_env.sh
+          emsdk list
+          yarn build
+      - uses: actions/upload-artifact@v2
+        with:
+          name: card-artifact
+          path: |
+            ./bin.js
+            ./card.js
+            ./card.wasm
   publish:
     name: Publish to npm
     runs-on: ubuntu-latest
+    needs: build
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
           node-version: '16'
           cache: 'npm'
+      - uses: actions/download-artifact@v2
+        with:
+          name: card-artifact
       - name: Publish
         run: |
+          yarn start
           npm config set //registry.npmjs.org/:_authToken ${NPM_TOKEN}
           npm ci
           npm publish
