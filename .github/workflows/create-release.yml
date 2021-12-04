@@ -3,11 +3,11 @@ on:
     tags:
       - 'v*'
 
-name: Build and Release
+name: build and release
 
 jobs:
   build:
-    name: Build
+    name: build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -17,6 +17,7 @@ jobs:
             toolchain: nightly
             override: true
             components: rustfmt, clippy
+      - name: add wasm target
         run: |
           rustup target add wasm32-unknown-emscripten
       - name: setup emsdk
