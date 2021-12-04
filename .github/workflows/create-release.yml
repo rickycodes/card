@@ -30,7 +30,6 @@ jobs:
           npm publish
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-
   create-github-release:
     name: Create GitHub Release
     runs-on: ubuntu-latest
