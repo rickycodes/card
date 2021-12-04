@@ -37,7 +37,7 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: my-artifact
-          path: *.js *.wasm
+          path: ./*.js ./*.wasm
   publish:
     name: Publish to npm
     runs-on: ubuntu-latest
