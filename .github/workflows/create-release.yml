@@ -7,13 +7,13 @@ name: Create Release
 
 jobs:
   build:
-    name: build
+    name: Build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: build
-      - run: echo wat hello.txt
-      - run: cat hello.txt
+      - name: wat
+        run: |
+          echo wat > hello.txt
       - uses: actions/upload-artifact@v2
         with:
           name: my-artifact
