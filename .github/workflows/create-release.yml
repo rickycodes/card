@@ -8,6 +8,7 @@ name: Create Release
 jobs:
   build:
     name: build
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - run: git --version
