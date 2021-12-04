@@ -6,22 +6,16 @@ on:
 name: Create Release
 
 jobs:
-  build:
-    name: build
+    name: Build and Publish to npm
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - run: git --version
-      - run: echo hello > world.txt
-      - run: cat world.txt
+      - run: mkdir -p build/
+      - run: echo hello > build/world.txt
       - uses: actions/upload-artifact@v2
         with:
-          name: business-card
-          path: ./world.txt
-  publish:
-    name: Publish to npm
-    runs-on: ubuntu-latest
-    steps:
+          name: my-artifact
+          path: build/world.txt      
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
@@ -30,7 +24,7 @@ jobs:
           name: business-card
       - name: Publish
         run: |
-          cat world.txt
+          cat build/world.txt
           npm config set //registry.npmjs.org/:_authToken ${NPM_TOKEN}
           npm ci
           npm publish
