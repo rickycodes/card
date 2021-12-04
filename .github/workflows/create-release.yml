@@ -33,7 +33,7 @@ jobs:
           cargo --version
           yarn --version
           emsdk list
-          yarn
+          yarn build
       - uses: actions/upload-artifact@v2
         with:
           name: my-artifact
