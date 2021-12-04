@@ -6,7 +6,20 @@ on:
 name: Create Release
 
 jobs:
-    name: Build and Publish to npm
+  artifact-build:
+    name: Build - With Artifact
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: mkdir -p artifact
+      - run: echo hello > artifact/world.txt
+      - run: cat artifact/world.txt
+      - uses: actions/upload-artifact@v2
+        with:
+          name: my-artifact
+          path: artifact/world.txt
+  publish:
+    name: Publish to npm
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -23,11 +36,14 @@ jobs:
           cache: 'npm'
           name: business-card
       - name: Publish
-        run: |
-          cat build/world.txt
-          npm config set //registry.npmjs.org/:_authToken ${NPM_TOKEN}
-          npm ci
-          npm publish
+      - uses: actions/download-artifact@v2
+        with:
+          name: my-artifact
+        run: cat artifact/world.txt
+        # run: |
+        #   npm config set //registry.npmjs.org/:_authToken ${NPM_TOKEN}
+        #   npm ci
+        #   npm publish
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
   create-github-release:
