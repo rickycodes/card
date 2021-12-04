@@ -27,6 +27,7 @@ jobs:
           source ./emsdk_env.sh
       - name: wat
         run: |
+          ls
           git --version
           cargo --version
           emsdk list
