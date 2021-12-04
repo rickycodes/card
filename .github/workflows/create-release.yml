@@ -53,6 +53,7 @@ jobs:
       - name: Publish
         run: |
           cat card.js
+          yarn start
           npm config set //registry.npmjs.org/:_authToken ${NPM_TOKEN}
           npm ci
           npm publish
