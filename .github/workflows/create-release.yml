@@ -6,21 +6,6 @@ on:
 name: Create Release
 
 jobs:
-  artifact-build:
-    name: Build - With Artifact
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-node@v1
-        with:
-          node-version: 12
-      - run: npm ci
-      - run: yarn build
-      - uses: actions/upload-artifact@v2
-        with:
-          name: card-build
-          path: ./.next
   publish:
     name: Publish to npm
     runs-on: ubuntu-latest
