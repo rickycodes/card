@@ -17,6 +17,14 @@ jobs:
             toolchain: nightly
             override: true
             components: rustfmt, clippy
+      - name: setup emsdk
+        run: |
+          git clone https://github.com/emscripten-core/emsdk.git
+          cd emsdk
+          git pull
+          ./emsdk install 2.0.0
+          ./emsdk activate 2.0.0
+          source ./emsdk_env.sh
       - name: wat
         run: |
           git --version
