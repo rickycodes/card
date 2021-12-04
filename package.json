@@ -13,9 +13,6 @@
     "build": "yarn cargo:build && yarn mv",
     "start": "node card.js"
   },
-  "publishConfig": {
-    "registry": "https://npm.pkg.github.com/"
-  },
   "author": "rickycodes",
   "license": "MIT"
 }
