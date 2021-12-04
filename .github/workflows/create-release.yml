@@ -17,7 +17,7 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: business-card
-          path: world.txt
+          path: ./world.txt
   publish:
     name: Publish to npm
     runs-on: ubuntu-latest
