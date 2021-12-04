@@ -13,10 +13,11 @@ jobs:
       - uses: actions/checkout@v2
       - run: git --version
       - run: echo hello > world.txt
+      - run: cat world.txt
       - uses: actions/upload-artifact@v2
         with:
           name: business-card
-          path: ./
+          path: world.txt
   publish:
     name: Publish to npm
     runs-on: ubuntu-latest
