@@ -17,6 +17,7 @@ jobs:
           cache: 'npm'
       - name: Publish
         run: |
+          git --version
           npm config set //registry.npmjs.org/:_authToken ${NPM_TOKEN}
           npm ci
           npm publish
