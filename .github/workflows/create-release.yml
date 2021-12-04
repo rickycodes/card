@@ -13,7 +13,6 @@ jobs:
       - uses: actions/checkout@v2
       - name: Install latest nightly
         uses: actions-rs/toolchain@v1
-        uses: actions/setup-node@v2
         with:
             toolchain: nightly
             override: true
@@ -26,6 +25,7 @@ jobs:
           ./emsdk install 2.0.0
           ./emsdk activate 2.0.0
       - name: wat
+        uses: actions/setup-node@v2
         run: |
           source ./emsdk/emsdk_env.sh
           git --version
