@@ -19,8 +19,8 @@ jobs:
             components: rustfmt, clippy
       - name: setup emsdk
         run: |
-          git clone https://github.com/emscripten-core/emsdk.git
-          cd emsdk
+          git clone https://github.com/emscripten-core/emsdk.git /emsdk
+          cd /emsdk
           git pull
           ./emsdk install 2.0.0
           ./emsdk activate 2.0.0
@@ -28,7 +28,7 @@ jobs:
         uses: actions/setup-node@v2
       - name: wat
         run: |
-          source ./emsdk/emsdk_env.sh
+          source /emsdk/emsdk_env.sh
           git --version
           cargo --version
           yarn --version
@@ -37,7 +37,7 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: my-artifact
-          path: ./{bin.js,card.*}
+          path: ./*
   publish:
     name: Publish to npm
     runs-on: ubuntu-latest
