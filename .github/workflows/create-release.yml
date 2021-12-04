@@ -13,6 +13,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: Install latest nightly
         uses: actions-rs/toolchain@v1
+        uses: actions/setup-node@v2
         with:
             toolchain: nightly
             override: true
@@ -29,13 +30,13 @@ jobs:
           source ./emsdk/emsdk_env.sh
           git --version
           cargo --version
+          yarn --version
           emsdk list
-          echo wat > hello.txt
-          cat hello.txt
+          yarn
       - uses: actions/upload-artifact@v2
         with:
           name: my-artifact
-          path: hello.txt
+          path: ./*
   publish:
     name: Publish to npm
     runs-on: ubuntu-latest
@@ -51,7 +52,7 @@ jobs:
           name: my-artifact
       - name: Publish
         run: |
-          cat hello.txt
+          cat card.js
           npm config set //registry.npmjs.org/:_authToken ${NPM_TOKEN}
           npm ci
           npm publish
