@@ -11,9 +11,17 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - name: Install latest nightly
+        uses: actions-rs/toolchain@v1
+        with:
+            toolchain: nightly
+            override: true
+            components: rustfmt, clippy
       - name: wat
         run: |
           git --version
+          cargo --version
+          emsdk list
           echo wat > hello.txt
           cat hello.txt
       - uses: actions/upload-artifact@v2
