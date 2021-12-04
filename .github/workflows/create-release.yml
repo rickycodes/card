@@ -9,36 +9,30 @@ jobs:
   artifact-build:
     name: Build - With Artifact
     runs-on: ubuntu-latest
+
     steps:
       - uses: actions/checkout@v2
       - run: mkdir -p artifact
       - run: echo hello > artifact/world.txt
-      - run: cat artifact/world.txt
       - uses: actions/upload-artifact@v2
         with:
-          name: my-artifact
+          name: artifact-build
           path: artifact/world.txt
   publish:
     name: Publish to npm
     runs-on: ubuntu-latest
+    needs: [artifact-build]
+
     steps:
-      - uses: actions/checkout@v2
-      - run: mkdir -p build/
-      - run: echo hello > build/world.txt
-      - uses: actions/upload-artifact@v2
-        with:
-          name: my-artifact
-          path: build/world.txt      
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2
         with:
           node-version: '16'
           cache: 'npm'
-          name: business-card
       - name: Publish
       - uses: actions/download-artifact@v2
         with:
-          name: my-artifact
+          name: artifact-build
         run: cat artifact/world.txt
         # run: |
         #   npm config set //registry.npmjs.org/:_authToken ${NPM_TOKEN}
@@ -46,19 +40,21 @@ jobs:
         #   npm publish
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-  create-github-release:
-    name: Create GitHub Release
-    runs-on: ubuntu-latest
-    needs: publish
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: Create Release Notes
-        uses: actions/github-script@v4.0.2
-        with:
-          github-token: ${{secrets.GITHUB_TOKEN}}
-          script: |
-            await github.request(`POST /repos/${{ github.repository }}/releases`, {
-              tag_name: "${{ github.ref }}",
-              generate_release_notes: true
-            });
+
+  # create-github-release:
+  #   name: Create GitHub Release
+  #   runs-on: ubuntu-latest
+  #   needs: publish
+
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v2
+  #     - name: Create Release Notes
+  #       uses: actions/github-script@v4.0.2
+  #       with:
+  #         github-token: ${{secrets.GITHUB_TOKEN}}
+  #         script: |
+  #           await github.request(`POST /repos/${{ github.repository }}/releases`, {
+  #             tag_name: "${{ github.ref }}",
+  #             generate_release_notes: true
+  #           });
