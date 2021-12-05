@@ -41,9 +41,9 @@ jobs:
         with:
           name: card
           path: |
-            ./bin.js
-            ./card.js
-            ./card.wasm
+            ./*
+            !./emsdk
+
   publish:
     name: Publish to npm
     runs-on: ubuntu-latest
