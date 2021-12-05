@@ -3,21 +3,21 @@ on:
     tags:
       - 'v*'
 
-name: build and release
+name: Build and Release
 
 jobs:
   build:
-    name: build
+    name: Build
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: setup rust
+      - name: Setup Rust
         uses: actions-rs/toolchain@v1
         with:
             toolchain: nightly
             override: true
             components: rustfmt, clippy
-      - name: add wasm target
+      - name: Add WASM Target
         run: |
           rustup target add wasm32-unknown-emscripten
       - name: setup emsdk
@@ -27,9 +27,9 @@ jobs:
           git pull
           ./emsdk install 2.0.0
           ./emsdk activate 2.0.0
-      - name: setup node
+      - name: Setup node
         uses: actions/setup-node@v2
-      - name: build
+      - name: Build
         run: |
           git --version
           cargo --version
@@ -39,7 +39,7 @@ jobs:
           yarn build
       - uses: actions/upload-artifact@v2
         with:
-          name: card-artifact
+          name: card
           path: |
             ./bin.js
             ./card.js
@@ -56,7 +56,7 @@ jobs:
           cache: 'npm'
       - uses: actions/download-artifact@v2
         with:
-          name: card-artifact
+          name: card
       - name: Publish
         run: |
           yarn start
