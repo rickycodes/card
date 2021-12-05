@@ -20,13 +20,18 @@ jobs:
       - name: Add wasm32-unknown-emscripten Target
         run: |
           rustup target add wasm32-unknown-emscripten
-      - name: Setup Emscripten SDK
-        run: |
-          git clone https://github.com/emscripten-core/emsdk.git
-          cd emsdk
-          git pull
-          ./emsdk install 2.0.0
-          ./emsdk activate 2.0.0
+      - name: Setup emsdk
+        uses: mymindstorm/setup-emsdk@v11
+        with:
+          # Make sure to set a version number!
+          version: 2.0.0
+          # This is the name of the cache folder.
+          # The cache folder will be placed in the build directory,
+          #  so make sure it doesn't conflict with anything!
+          actions-cache-folder: 'emsdk-cache'
+
+      - name: Verify
+        run: emcc -v
       - name: Setup node
         uses: actions/setup-node@v2
       - name: Build
