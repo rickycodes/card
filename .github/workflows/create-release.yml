@@ -41,10 +41,11 @@ jobs:
         with:
           name: card
           path: |
-            ./*
-            !emsdk/
-            !src/
-            !target/
+            ./*.js
+            ./*.json
+            ./card.wasm
+            LICENSE
+            README.md
   publish:
     name: Publish to npm
     runs-on: ubuntu-latest
