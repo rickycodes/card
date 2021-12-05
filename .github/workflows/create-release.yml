@@ -17,10 +17,10 @@ jobs:
             toolchain: nightly
             override: true
             components: rustfmt, clippy
-      - name: Add WASM Target
+      - name: Add wasm32-unknown-emscripten Target
         run: |
           rustup target add wasm32-unknown-emscripten
-      - name: setup emsdk
+      - name: Setup Emscripten SDK
         run: |
           git clone https://github.com/emscripten-core/emsdk.git
           cd emsdk
