@@ -42,8 +42,9 @@ jobs:
           name: card
           path: |
             ./*
-            !./emsdk
-
+            !emsdk/
+            !src/
+            !target/
   publish:
     name: Publish to npm
     runs-on: ubuntu-latest
