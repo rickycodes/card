@@ -23,14 +23,10 @@ jobs:
       - name: Setup emsdk
         uses: mymindstorm/setup-emsdk@v11
         with:
-          # Make sure to set a version number!
           version: 2.0.0
-          # This is the name of the cache folder.
-          # The cache folder will be placed in the build directory,
-          #  so make sure it doesn't conflict with anything!
           actions-cache-folder: 'emsdk-cache'
 
-      - name: Verify
+      - name: Verify emsdk
         run: emcc -v
       - name: Setup node
         uses: actions/setup-node@v2
@@ -39,8 +35,6 @@ jobs:
           git --version
           cargo --version
           yarn --version
-          source ./emsdk/emsdk_env.sh
-          emsdk list
           yarn build
       - uses: actions/upload-artifact@v2
         with:
