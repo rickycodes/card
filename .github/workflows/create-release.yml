@@ -36,6 +36,7 @@ jobs:
             LICENSE
             README.md
   publish:
+    environment: publish
     runs-on: ubuntu-latest
     needs: build
     steps:
@@ -49,7 +50,6 @@ jobs:
           npm-token: ${{ secrets.NPM_TOKEN }}
 
   github-release:
-    environment: publish
     runs-on: ubuntu-latest
     needs: publish
     steps:
