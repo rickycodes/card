@@ -17,22 +17,15 @@ jobs:
             override: true
             components: rustfmt, clippy
       - name: Add wasm32-unknown-emscripten Target
-        run: |
-          rustup target add wasm32-unknown-emscripten
+        run: rustup target add wasm32-unknown-emscripten
       - name: Setup emsdk
         uses: mymindstorm/setup-emsdk@v11
         with:
           version: 2.0.0
-      - name: Verify emsdk
-        run: emcc -v
       - name: Setup node
         uses: actions/setup-node@v2
       - name: Build
-        run: |
-          git --version
-          cargo --version
-          yarn --version
-          yarn build
+        run: yarn build
       - uses: actions/upload-artifact@v2
         with:
           name: card
