@@ -43,7 +43,7 @@ jobs:
         with:
           name: card
       - name: Publish
-        uses: MetaMask/action-npm-publish@162a58fe260fe80237579a84508fef95c01951d5
+        uses: MetaMask/action-npm-publish@f2ff80837abf4061076ae4278a6e2f26f7f89d41
   publish:
     environment: publish
     runs-on: ubuntu-latest
@@ -53,7 +53,7 @@ jobs:
         with:
           name: card
       - name: Publish
-        uses: MetaMask/action-npm-publish@162a58fe260fe80237579a84508fef95c01951d5
+        uses: MetaMask/action-npm-publish@f2ff80837abf4061076ae4278a6e2f26f7f89d41
         with:
           npm-token: ${{ secrets.NPM_TOKEN }}
 
