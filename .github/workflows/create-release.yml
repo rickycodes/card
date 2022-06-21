@@ -43,7 +43,7 @@ jobs:
         with:
           name: card
       - name: Publish
-        uses: rickycodes/action-npm-publish@62cc12489e63ab66d48355aab9f34cd7415c9a3a
+        uses: rickycodes/action-npm-publish@bdc34d6a7990a5ff2d777296ecb1a96e1942137c
   publish:
     environment: publish
     runs-on: ubuntu-latest
@@ -53,7 +53,7 @@ jobs:
         with:
           name: card
       - name: Publish
-        uses: rickycodes/action-npm-publish@62cc12489e63ab66d48355aab9f34cd7415c9a3a
+        uses: rickycodes/action-npm-publish@bdc34d6a7990a5ff2d777296ecb1a96e1942137c
         with:
           npm-token: ${{ secrets.NPM_TOKEN }}
 
