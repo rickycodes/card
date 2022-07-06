@@ -43,7 +43,7 @@ jobs:
         with:
           name: card
       - name: Publish
-        uses: rickycodes/action-npm-publish@v1.2.0
+        uses: MetaMask/action-npm-publish@v1.2.0
   publish:
     environment: publish
     runs-on: ubuntu-latest
@@ -53,7 +53,7 @@ jobs:
         with:
           name: card
       - name: Publish
-        uses: rickycodes/action-npm-publish@v1.2.0
+        uses: MetaMask/action-npm-publish@v1.2.0
         with:
           npm-token: ${{ secrets.NPM_TOKEN }}
 
