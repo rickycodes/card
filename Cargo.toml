@@ -6,4 +6,5 @@ authors = ["rickycodes <ricky.miller@gmail.com>"]
 edition = "2018"
 
 [dependencies]
-ansi_term = "0.12.1"
+crossterm = "0.28"
+ratatui = "0.29"

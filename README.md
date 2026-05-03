@@ -1,32 +1,40 @@
 ## Goal
 
-Write a CLI using rustlang targetting wasm so we can run on node and deploy with npx/npm
+Write a CLI in Rust that can still be published to `npm` and launched with `npx`.
 
 <img src="screenshot.png">
 
 ## Building
 
-```
-cargo build --target=wasm32-unknown-emscripten --release
-```
-
-This moves files into:
-```
-./target/wasm32-unknown-emscripten/release/
-```
-Copy generated `card.js` and `card.wasm` into the root so the [bin](bin.js) can read it:
-
-```
-mv ./target/wasm32-unknown-emscripten/release/card.* .
+```sh
+cargo build --release
 ```
 
-Done!
+The native binary is emitted to:
 
-Once published the binary can be executed with npx:
+```sh
+./target/release/card
 ```
+
+`npm install` also runs the build automatically through [scripts/install.js](scripts/install.js), so the package remains publishable on `npm`.
+
+## Running
+
+```sh
 npx rickycodes
 ```
-Scripts are also discoverable in [package.json](package.json#L9)
+
+The default experience is now a native `ratatui` app. Exit with `q`, `Esc`, or `Ctrl-C`.
+
+To inspect the ANSI palette helper:
+
+```sh
+npx rickycodes colours
+```
+
+## Packaging tradeoff
+
+`ratatui` requires a real terminal, so this package no longer targets wasm for Node execution. The `npm` package now ships the Rust source and compiles a native binary during install. That preserves the `npm`/`npx` workflow, but consumers need a working Rust toolchain unless you later add prebuilt binaries per platform.
 
 ## License
 

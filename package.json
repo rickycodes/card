@@ -2,16 +2,23 @@
   "name": "rickycodes",
   "version": "1.6.16",
   "description": "my business card",
-  "main": "index.js",
   "bin": {
     "rickycodes": "./bin.js"
   },
+  "files": [
+    "bin.js",
+    "Cargo.toml",
+    "Cargo.lock",
+    "src",
+    "scripts",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "cargo:build": "cargo build --target=wasm32-unknown-emscripten --release",
-    "mv": "mv ./target/wasm32-unknown-emscripten/release/card.* .",
-    "build": "yarn cargo:build && yarn mv",
-    "start": "node card.js"
+    "postinstall": "node ./scripts/install.js",
+    "cargo:build": "cargo build --release",
+    "build": "npm run cargo:build",
+    "start": "node ./bin.js"
   },
   "author": "rickycodes",
   "license": "MIT"

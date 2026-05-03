@@ -1,74 +1,50 @@
-#[derive(Debug)]
-pub struct Sites<'a> {
-    pub web: &'a str,
-    pub twitter: &'a str,
-    pub npm: &'a str,
-    pub github: &'a str,
-    pub crates: &'a str,
-}
-
-impl Sites<'_> {
-    pub fn as_formatted_list(&self, handle: &str) -> Vec<String> {
-        let mut a = vec![];
-        [self.web, self.twitter, self.github, self.npm, self.crates]
-            .iter()
-            .enumerate()
-            .for_each(|(index, url)| {
-                let mut owned: String = "https://".to_owned();
-                owned.push_str(url);
-                if index != 0 {
-                    // owned.push('/');
-                    owned.push_str(handle);
-                }
-                a.push(owned)
-            });
-
-        a
-    }
+#[derive(Clone, Copy, Debug)]
+pub struct Link<'a> {
+    pub label: &'a str,
+    pub url: &'a str,
 }
 
 pub struct Card<'a> {
     pub name: &'a str,
-    pub title: &'a str,
     pub handle: &'a str,
+    pub title: &'a str,
     pub company: &'a str,
-    pub sites: Sites<'a>,
+    pub links: [Link<'a>; 3],
 }
 
 pub const CARD: Card = Card {
     name: "Ricky Miller",
-    title: "Software Developer",
     handle: "rickycodes",
+    title: "Software Developer",
     company: "MetaMask",
-    sites: Sites {
-        web: "ricky.codes",
-        twitter: "twitter.com/",
-        github: "github.com/",
-        npm: "npm.im/~",
-        crates: "crates.io/users/",
-    },
+    links: [
+        Link {
+            label: "Website",
+            url: "https://ricky.codes",
+        },
+        Link {
+            label: "GitHub",
+            url: "https://github.com/rickycodes",
+        },
+        Link {
+            label: "bsky",
+            url: "https://bsky.app/profile/ricky.codes",
+        },
+    ],
 };
 
-const LEN: usize = 4;
+const LEN: usize = 3;
 pub const CONTENT: [&str; LEN] = [
     "I write software on a clicky keyboard",
-    "Sometimes fun CLI things like this!",
-    "I currently work as a",
-    "    Learn more:\n",
+    "Sometimes fun TUI things like this!",
+    "Learn more:",
 ];
 
-use ansi_term::Colour;
-
-// output ansi colours
 pub fn colours() {
     for x in 1..255 {
-        let s = format!("{} {}", x, ["█"; 60].join(""));
-        println!("{}", Colour::Fixed(x).paint(s));
+        println!("\x1b[38;5;{x}m{x:>3} {}\x1b[0m", ["█"; 40].join(""));
     }
 }
-
-pub const FOUR: &str = "    ";
-pub const NL: &str = "\n";
 
 pub const HELLO: [&str; 4] = [
     "    |   |     |    |",
