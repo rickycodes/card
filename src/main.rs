@@ -1,14 +1,11 @@
-use std::env;
 use std::io;
 use std::process::Command;
-use std::time::{Duration, Instant, SystemTime, UNIX_EPOCH};
+use std::time::Duration;
 
-mod constants;
-
-use crate::constants::{
-    colours, ALERT, BG, CARD, CONTENT, DEFAULT_LOL_DIALOG_COUNT, HELLO, LOL_BUTTON_LABEL,
-    LOL_CONFIRM_TEXT, LOL_MESSAGES, LOL_TITLES, MAX_LOL_DIALOG_COUNT, MUTED, PRIMARY,
-    PRIMARY_ACTIVE, SECONDARY, SURFACE, TEXT,
+use card::app::{lol_dialog_count, now_ms, ActivateResult, AppState, LolDialog};
+use card::constants::{
+    colours, ALERT, BG, CARD, CONTENT, HELLO, LOL_BUTTON_LABEL, MUTED, PRIMARY, PRIMARY_ACTIVE,
+    SECONDARY, SURFACE, TEXT,
 };
 use crossterm::{
     event::{self, Event, KeyCode, KeyEventKind, KeyModifiers},
@@ -20,22 +17,8 @@ use ratatui::{
     widgets::{Block, Borders, Clear, Paragraph, Wrap},
 };
 
-#[derive(Clone, Copy)]
-struct LolDialog {
-    rect: Rect,
-    title: &'static str,
-    message: &'static str,
-    confirm: &'static str,
-}
-
-struct AppState {
-    selected_button: usize,
-    dialogs: Vec<LolDialog>,
-    dialogs_spawned_at: Option<Instant>,
-}
-
 fn main() {
-    let args: Vec<String> = env::args().collect();
+    let args: Vec<String> = std::env::args().collect();
 
     match args.len() {
         1 => run_app().unwrap_or_else(report_terminal_error),
@@ -74,14 +57,10 @@ fn run_app() -> io::Result<()> {
 }
 
 fn run_event_loop(terminal: &mut Terminal<CrosstermBackend<io::Stdout>>) -> io::Result<()> {
-    let mut app = AppState {
-        selected_button: 0,
-        dialogs: Vec::new(),
-        dialogs_spawned_at: None,
-    };
+    let mut app = AppState::new();
 
     loop {
-        clear_expired_dialogs(&mut app);
+        app.clear_expired_dialogs(now_ms());
         terminal.draw(|frame| draw(frame, &app))?;
 
         if event::poll(Duration::from_millis(200))? {
@@ -90,24 +69,18 @@ fn run_event_loop(terminal: &mut Terminal<CrosstermBackend<io::Stdout>>) -> io::
                     KeyCode::Char('q') | KeyCode::Esc => break,
                     KeyCode::Char('c') if key.modifiers.contains(KeyModifiers::CONTROL) => break,
                     KeyCode::Tab | KeyCode::Right | KeyCode::Down => {
-                        app.selected_button = (app.selected_button + 1) % button_count();
+                        app.next_button(&CARD);
                     }
                     KeyCode::BackTab | KeyCode::Left | KeyCode::Up => {
-                        app.selected_button = if app.selected_button == 0 {
-                            button_count() - 1
-                        } else {
-                            app.selected_button - 1
-                        };
+                        app.previous_button(&CARD);
                     }
-                    KeyCode::Enter => {
-                        if app.selected_button < CARD.links.len() {
-                            open_in_browser(CARD.links[app.selected_button].url)?;
-                        } else {
+                    KeyCode::Enter => match app.activate_selected(&CARD) {
+                        ActivateResult::OpenUrl(url) => open_in_browser(url)?,
+                        ActivateResult::SpawnLol => {
                             let area = size_to_rect(terminal.size()?);
-                            app.dialogs = spawn_lol_dialogs(area, lol_dialog_count());
-                            app.dialogs_spawned_at = Some(Instant::now());
+                            app.spawn_lol_dialogs(area, lol_dialog_count(), now_ms());
                         }
-                    }
+                    },
                     _ => {}
                 },
                 Event::Resize(_, _) => {}
@@ -190,7 +163,10 @@ fn build_card_lines(selected_button: usize) -> Vec<Line<'static>> {
     for (index, link) in CARD.links.iter().enumerate() {
         lines.push(button_line(link.label, index == selected_button));
     }
-    lines.push(button_line(LOL_BUTTON_LABEL, CARD.links.len() == selected_button));
+    lines.push(button_line(
+        LOL_BUTTON_LABEL,
+        CARD.links.len() == selected_button,
+    ));
 
     lines.push(Line::raw(""));
     lines.push(Line::from(vec![
@@ -272,61 +248,6 @@ fn draw_lol_dialog(frame: &mut Frame, dialog: &LolDialog, area: Rect) {
     frame.render_widget(paragraph, inner);
 }
 
-fn clear_expired_dialogs(app: &mut AppState) {
-    if app
-        .dialogs_spawned_at
-        .is_some_and(|spawned_at| spawned_at.elapsed() >= Duration::from_secs(5))
-    {
-        app.dialogs.clear();
-        app.dialogs_spawned_at = None;
-    }
-}
-
-fn spawn_lol_dialogs(area: Rect, count: usize) -> Vec<LolDialog> {
-    let mut rng = SimpleRng::from_entropy();
-    (0..count)
-        .map(|_| random_lol_dialog(area, &mut rng))
-        .collect()
-}
-
-fn random_lol_dialog(area: Rect, rng: &mut SimpleRng) -> LolDialog {
-    let title = rng.pick(&LOL_TITLES);
-    let message = rng.pick(&LOL_MESSAGES);
-    let confirm = rng.pick(&LOL_CONFIRM_TEXT);
-    let width = dialog_width(title, message, confirm).min(area.width.saturating_sub(1).max(1));
-    let height = 6u16.min(area.height.saturating_sub(1).max(1));
-    let max_x = area
-        .x
-        .saturating_add(area.width.saturating_sub(width).saturating_sub(1));
-    let max_y = area
-        .y
-        .saturating_add(area.height.saturating_sub(height).saturating_sub(1));
-    let x = rng.range_u16(area.x, max_x);
-    let y = rng.range_u16(area.y, max_y);
-
-    LolDialog {
-        rect: Rect {
-            x,
-            y,
-            width,
-            height,
-        },
-        title,
-        message,
-        confirm,
-    }
-}
-
-fn dialog_width(title: &str, message: &str, confirm: &str) -> u16 {
-    let button_width = confirm.len().saturating_add(6);
-    let width = title
-        .len()
-        .max(message.len())
-        .max(button_width)
-        .saturating_add(4);
-    width.clamp(22, 42) as u16
-}
-
 fn clip_rect(rect: Rect, bounds: Rect) -> Rect {
     let x = rect.x.max(bounds.x);
     let y = rect.y.max(bounds.y);
@@ -345,18 +266,6 @@ fn clip_rect(rect: Rect, bounds: Rect) -> Rect {
         width: right.saturating_sub(x),
         height: bottom.saturating_sub(y),
     }
-}
-
-fn button_count() -> usize {
-    CARD.links.len() + 1
-}
-
-fn lol_dialog_count() -> usize {
-    env::var("LOL_DIALOG_COUNT")
-        .ok()
-        .and_then(|value| value.parse::<usize>().ok())
-        .map(|value| value.clamp(1, MAX_LOL_DIALOG_COUNT))
-        .unwrap_or(DEFAULT_LOL_DIALOG_COUNT)
 }
 
 fn open_in_browser(url: &str) -> io::Result<()> {
@@ -396,38 +305,5 @@ fn centered_rect(width: u16, height: u16, area: Rect) -> Rect {
         y: area.y + vertical_margin,
         width: width.min(area.width),
         height: height.min(area.height),
-    }
-}
-
-struct SimpleRng(u64);
-
-impl SimpleRng {
-    fn from_entropy() -> Self {
-        let seed = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .map(|duration| duration.as_nanos() as u64)
-            .unwrap_or(0x5eed_fade_cafe_beef);
-        Self(seed ^ 0xa5a5_5a5a_d3c0_b33f)
-    }
-
-    fn next_u32(&mut self) -> u32 {
-        self.0 ^= self.0 << 13;
-        self.0 ^= self.0 >> 7;
-        self.0 ^= self.0 << 17;
-        self.0 as u32
-    }
-
-    fn range_u16(&mut self, start: u16, end: u16) -> u16 {
-        if start >= end {
-            return start;
-        }
-
-        let span = u32::from(end - start + 1);
-        start + (self.next_u32() % span) as u16
-    }
-
-    fn pick<T: Copy>(&mut self, items: &[T]) -> T {
-        let index = (self.next_u32() as usize) % items.len();
-        items[index]
     }
 }

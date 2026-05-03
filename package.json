@@ -7,6 +7,7 @@
   },
   "files": [
     "bin.js",
+    "dist",
     "Cargo.toml",
     "Cargo.lock",
     "src",
@@ -15,9 +16,12 @@
     "LICENSE"
   ],
   "scripts": {
-    "postinstall": "node ./scripts/install.js",
-    "cargo:build": "cargo build --release",
-    "build": "npm run cargo:build",
+    "native:build": "cargo +stable build --release",
+    "wasm:build": "cargo +stable build --release --target wasm32-unknown-unknown --lib --no-default-features",
+    "wasm:stage": "node ./scripts/package-wasm.js",
+    "build": "npm run wasm:build && npm run wasm:stage",
+    "prepack": "npm run build",
+    "start:wasm": "node ./scripts/wasm-runner.js",
     "start": "node ./bin.js"
   },
   "author": "rickycodes",

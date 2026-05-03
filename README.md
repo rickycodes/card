@@ -7,16 +7,20 @@ Write a CLI in Rust that can still be published to `npm` and launched with `npx`
 ## Building
 
 ```sh
-cargo build --release
+npm run build
 ```
 
-The native binary is emitted to:
+This builds the wasm target and stages the packaged artifact at:
 
 ```sh
-./target/release/card
+./dist/card.wasm
 ```
 
-`npm install` also runs the build automatically through [scripts/install.js](scripts/install.js), so the package remains publishable on `npm`.
+For local native development, you can still build the Rust CLI directly:
+
+```sh
+npm run native:build
+```
 
 ## Running
 
@@ -24,7 +28,7 @@ The native binary is emitted to:
 npx rickycodes
 ```
 
-The default experience is now a native `ratatui` app. Exit with `q`, `Esc`, or `Ctrl-C`.
+The default npm experience is now Node + wasm. Exit with `q`, `Esc`, or `Ctrl-C`.
 
 To inspect the ANSI palette helper:
 
@@ -34,7 +38,7 @@ npx rickycodes colours
 
 ## Packaging tradeoff
 
-`ratatui` requires a real terminal, so this package no longer targets wasm for Node execution. The `npm` package now ships the Rust source and compiles a native binary during install. That preserves the `npm`/`npx` workflow, but consumers need a working Rust toolchain unless you later add prebuilt binaries per platform.
+The published package can now run on a Node-only machine because it ships a prebuilt `card.wasm` artifact instead of compiling Rust during `npm install`. Rust tooling is still needed by the publisher when producing that artifact.
 
 ## License
 
