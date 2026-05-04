@@ -65,8 +65,8 @@ pub const SECONDARY: Color = Color::Rgb(0, 116, 85);
 pub const ALERT: Color = Color::Rgb(255, 96, 96);
 
 pub const LOL_BUTTON_LABEL: &str = "lol";
-pub const DEFAULT_LOL_DIALOG_COUNT: usize = 16;
-pub const MAX_LOL_DIALOG_COUNT: usize = 32;
+pub const DEFAULT_LOL_DIALOG_COUNT: usize = 32;
+pub const MAX_LOL_DIALOG_COUNT: usize = 64;
 
 pub const LOL_TITLES: [&str; 8] = [
     "intrusion.exe",
