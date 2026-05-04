@@ -1,4 +1,7 @@
 /target
+/dist
 
 # node
 node_modules
+*.tgz
+npm-debug.log*
