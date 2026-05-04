@@ -1,6 +1,6 @@
 {
   "name": "rickycodes",
-  "version": "1.7.00",
+  "version": "1.7.01",
   "description": "my business card",
   "bin": {
     "rickycodes": "./bin.js"
