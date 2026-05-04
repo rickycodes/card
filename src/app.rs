@@ -7,12 +7,13 @@ use ratatui::{
 };
 
 use crate::constants::{
-    Card, ALERT, CONTENT, DEFAULT_LOL_DIALOG_COUNT, HELLO, LOL_BUTTON_LABEL, LOL_CONFIRM_TEXT,
+    Card, CONTENT, DEFAULT_LOL_DIALOG_COUNT, HELLO, LOL_BUTTON_LABEL, LOL_CONFIRM_TEXT,
     LOL_MESSAGES, LOL_TITLES, MAX_LOL_DIALOG_COUNT, MUTED, PRIMARY, PRIMARY_ACTIVE, SECONDARY,
     SURFACE, TEXT,
 };
 
 const LOL_DIALOG_BATCH_LIFETIME_MS: u64 = 5_000;
+const LOL_DIALOG_OPEN_OFFSET_MS: u64 = 150;
 
 #[derive(Clone, Copy)]
 pub struct LolDialog {
@@ -25,7 +26,13 @@ pub struct LolDialog {
 pub struct AppState {
     pub selected_button: usize,
     pub dialogs: Vec<LolDialog>,
+    pending_dialogs: Vec<ScheduledLolDialog>,
     dialogs_expire_at_ms: Option<u64>,
+}
+
+struct ScheduledLolDialog {
+    open_at_ms: u64,
+    dialog: LolDialog,
 }
 
 pub enum ActivateResult<'a> {
@@ -33,11 +40,18 @@ pub enum ActivateResult<'a> {
     SpawnLol,
 }
 
+impl Default for AppState {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 impl AppState {
     pub fn new() -> Self {
         Self {
             selected_button: 0,
             dialogs: Vec::new(),
+            pending_dialogs: Vec::new(),
             dialogs_expire_at_ms: None,
         }
     }
@@ -64,18 +78,56 @@ impl AppState {
 
     pub fn spawn_lol_dialogs(&mut self, area: Rect, count: usize, now_ms: u64) {
         let mut rng = SimpleRng::from_seed(now_ms ^ 0xa5a5_5a5a_d3c0_b33f);
-        self.dialogs = (0..count)
-            .map(|_| random_lol_dialog(area, &mut rng))
-            .collect();
-        self.dialogs_expire_at_ms = Some(now_ms + LOL_DIALOG_BATCH_LIFETIME_MS);
+        self.dialogs.clear();
+        self.pending_dialogs.clear();
+
+        if count == 0 {
+            self.dialogs_expire_at_ms = None;
+            return;
+        }
+
+        for index in 0..count {
+            let dialog = random_lol_dialog(area, &mut rng);
+            if index == 0 {
+                self.dialogs.push(dialog);
+                continue;
+            }
+
+            self.pending_dialogs.push(ScheduledLolDialog {
+                open_at_ms: now_ms
+                    .saturating_add((index as u64).saturating_mul(LOL_DIALOG_OPEN_OFFSET_MS)),
+                dialog,
+            });
+        }
+
+        self.dialogs_expire_at_ms = Some(
+            now_ms.saturating_add(
+                ((count as u64).saturating_sub(1))
+                    .saturating_mul(LOL_DIALOG_OPEN_OFFSET_MS)
+                    .saturating_add(LOL_DIALOG_BATCH_LIFETIME_MS),
+            ),
+        );
     }
 
     pub fn clear_expired_dialogs(&mut self, now_ms: u64) {
+        if !self.pending_dialogs.is_empty() {
+            let mut still_pending = Vec::with_capacity(self.pending_dialogs.len());
+            for scheduled in self.pending_dialogs.drain(..) {
+                if now_ms >= scheduled.open_at_ms {
+                    self.dialogs.push(scheduled.dialog);
+                } else {
+                    still_pending.push(scheduled);
+                }
+            }
+            self.pending_dialogs = still_pending;
+        }
+
         if self
             .dialogs_expire_at_ms
             .is_some_and(|expires_at| now_ms >= expires_at)
         {
             self.dialogs.clear();
+            self.pending_dialogs.clear();
             self.dialogs_expire_at_ms = None;
         }
     }
@@ -162,8 +214,12 @@ fn draw_lol_dialog(buffer: &mut Buffer, dialog: &LolDialog, area: Rect) {
     let block = Block::default()
         .title(format!(" {} ", dialog.title))
         .borders(Borders::ALL)
-        .title_style(Style::default().fg(ALERT).add_modifier(Modifier::BOLD))
-        .border_style(Style::default().fg(ALERT))
+        .title_style(
+            Style::default()
+                .fg(PRIMARY_ACTIVE)
+                .add_modifier(Modifier::BOLD),
+        )
+        .border_style(Style::default().fg(PRIMARY))
         .style(Style::default().bg(SURFACE));
     let inner = block.inner(rect);
     block.render(rect, buffer);

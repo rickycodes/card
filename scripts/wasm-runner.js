@@ -25,11 +25,11 @@ function resolveWasmPath() {
 
 function openUrl(url) {
   if (process.platform === "darwin") {
-    spawn("open", [url], { stdio: "ignore", detached: true }).unref();
+    spawn("open", [url], { stdio: ["ignore", "ignore", "ignore"], detached: true }).unref();
   } else if (process.platform === "win32") {
-    spawn("cmd", ["/C", "start", "", url], { stdio: "ignore", detached: true }).unref();
+    spawn("cmd", ["/C", "start", "", url], { stdio: ["ignore", "ignore", "ignore"], detached: true }).unref();
   } else {
-    spawn("xdg-open", [url], { stdio: "ignore", detached: true }).unref();
+    spawn("xdg-open", [url], { stdio: ["ignore", "ignore", "ignore"], detached: true }).unref();
   }
 }
 

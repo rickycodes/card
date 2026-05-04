@@ -4,8 +4,8 @@ use std::time::Duration;
 
 use card::app::{lol_dialog_count, now_ms, ActivateResult, AppState, LolDialog};
 use card::constants::{
-    colours, ALERT, BG, CARD, CONTENT, HELLO, LOL_BUTTON_LABEL, MUTED, PRIMARY, PRIMARY_ACTIVE,
-    SECONDARY, SURFACE, TEXT,
+    colours, BG, CARD, CONTENT, HELLO, LOL_BUTTON_LABEL, MUTED, PRIMARY, PRIMARY_ACTIVE, SECONDARY,
+    SURFACE, TEXT,
 };
 use crossterm::{
     event::{self, Event, KeyCode, KeyEventKind, KeyModifiers},
@@ -227,8 +227,12 @@ fn draw_lol_dialog(frame: &mut Frame, dialog: &LolDialog, area: Rect) {
     let block = Block::default()
         .title(format!(" {} ", dialog.title))
         .borders(Borders::ALL)
-        .title_style(Style::default().fg(ALERT).add_modifier(Modifier::BOLD))
-        .border_style(Style::default().fg(ALERT))
+        .title_style(
+            Style::default()
+                .fg(PRIMARY_ACTIVE)
+                .add_modifier(Modifier::BOLD),
+        )
+        .border_style(Style::default().fg(PRIMARY))
         .style(Style::default().bg(SURFACE));
     let inner = block.inner(rect);
     frame.render_widget(block, rect);
@@ -283,6 +287,8 @@ fn open_in_browser(url: &str) -> io::Result<()> {
         command
     };
 
+    command.stdout(std::process::Stdio::null());
+    command.stderr(std::process::Stdio::null());
     command.spawn()?;
     Ok(())
 }

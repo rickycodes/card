@@ -10,7 +10,7 @@ crate-type = ["rlib", "cdylib"]
 
 [features]
 default = ["native-cli"]
-native-cli = ["dep:crossterm", "ratatui/crossterm"]
+native-cli = ["crossterm", "ratatui/crossterm"]
 
 [[bin]]
 name = "card"
