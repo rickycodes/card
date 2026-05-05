@@ -2,7 +2,7 @@
 
 Write a CLI in Rust that can still be published to `npm` and launched with `npx`.
 
-<img src="screenshot.png">
+<img src="demo.gif">
 
 ## Building
 
