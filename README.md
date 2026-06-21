@@ -22,6 +22,12 @@ For local native development, you can still build the Rust CLI directly:
 npm run native:build
 ```
 
+Which runs cargo directly:
+
+```sh
+cargo +stable build --release
+```
+
 ## Running
 
 ```sh
